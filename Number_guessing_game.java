@@ -1,63 +1,65 @@
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.event.*;
 import java.util.Random;
 
-public class Number_guessing_game
-{
-    public static void main(String args[])
-    {
-        Scanner sc= new Scanner(System.in);
-        Random ran= new Random();
-        boolean playagain= true;
+public class Number_guessing_game {
+    private int numberToGuess;
+    private int attemptsLeft;
+    private Random random;
 
-        System.out.println("Welcome to the game <3");
+    public Number_guessing_game() {
+        random = new Random();
+        resetGame();
 
-        while (playagain)
-        {
-            int number_to_guess = ran.nextInt(100)+1;
-            int attempts_left=7;
-            boolean has_guessed_correctly= false;
+        JFrame frame = new JFrame("Number Guessing Game");
+        JTextField inputField = new JTextField(10);
+        JButton guessButton = new JButton("Guess");
+        JLabel messageLabel = new JLabel("Guess a number between 1 and 100");
+        JLabel attemptsLabel = new JLabel("Attempts left: " + attemptsLeft);
 
-            System.out.println("I am thinking of a number between 1 to 100");
-            System.out.println("Left attempts" + attempts_left+ "Goodluck!");
-            
-            while (attempts_left>0)
-            {
-                System.out.println("Enter your guess");
-                int player_guess= sc.nextInt();
-                attempts_left--;
+        JPanel panel = new JPanel();
+        panel.add(messageLabel);
+        panel.add(inputField);
+        panel.add(guessButton);
+        panel.add(attemptsLabel);
 
-                if (player_guess == number_to_guess)
-                {
-                    System.out.println("Correct!!!!!!!");
-                    has_guessed_correctly= true;
-                    break;
+        guessButton.addActionListener(e -> {
+            try {
+                int guess = Integer.parseInt(inputField.getText());
+                attemptsLeft--;
+
+                if (guess == numberToGuess) {
+                    messageLabel.setText("Correct! 🎉");
+                    guessButton.setEnabled(false);
+                } else if (attemptsLeft == 0) {
+                    messageLabel.setText("Out of attempts! Number was " + numberToGuess);
+                    guessButton.setEnabled(false);
+                } else if (guess < numberToGuess) {
+                    messageLabel.setText("Too low!");
+                } else {
+                    messageLabel.setText("Too high!");
                 }
-                else if (player_guess > number_to_guess)
-                {
-                    System.out.println("Too high!");
-                }
-                else
-                {
-                    System.out.println("Too low!");
-                }
+                attemptsLabel.setText("Attempts left: " + attemptsLeft);
+                inputField.setText("");
 
-                System.out.println("Attempts left"+ attempts_left);
+            } catch (NumberFormatException ex) {
+                messageLabel.setText("Please enter a valid number.");
             }
+        });
 
-            if (!has_guessed_correctly)
-            {
-                System.out.println("Out of attepmts!! The correct one is " + number_to_guess);
-            }
+        int restart = JOptionPane.showConfirmDialog(frame, panel, "Play the Game", JOptionPane.DEFAULT_OPTION);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
+        frame.setContentPane(panel);
+        frame.setVisible(true);
+    }
 
-            System.out.println("Do you want to play again? (Y/N)" );
-            sc.nextLine(); // fix for input bug
-            String answer = sc.nextLine();
-            playagain = answer.equalsIgnoreCase("yes") || answer.equalsIgnoreCase("y");
+    private void resetGame() {
+        numberToGuess = random.nextInt(100) + 1;
+        attemptsLeft = 7;
+    }
 
-        }
-
-        System.out.println("Thanks for playing");
-        sc.close();
-
+    public static void main(String[] args) {
+        new Number_guessing_game();
     }
 }
